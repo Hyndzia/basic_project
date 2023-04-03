@@ -5,6 +5,7 @@
 class Animal;
 class Person {
 public:
+    Person(const Person& person): name(person.name), surname(person.surname), age(person.age), gender(person.gender), pet(person.pet), petFlag(person.petFlag){}
     Person() : name(""), surname(""), age(0), gender(""), pet(nullptr), petFlag(false) {}
     ~Person(){
         name = "";

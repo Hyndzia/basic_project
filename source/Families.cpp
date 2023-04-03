@@ -39,9 +39,4 @@ void Families::view(Person* p) {
     std::cout << "\n\n";
 
 }
-void Families::create_p(Person**& p_arr, const size_t size) {
-    p_arr = new Person * [size];
-    for (size_t i = 0; i < size; i++) {
-        p_arr[i] = new Person();
-    }
-}
+

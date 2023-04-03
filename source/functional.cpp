@@ -22,10 +22,6 @@ void create(Person**& p_arr, const size_t size) {
     }
 }
 
-Person* create(const Person& person) {
-    return new Person(person);
-}
-
 void del(Animal*& a_arr, size_t& size){
     delete[] a_arr;
     a_arr = nullptr;
@@ -291,7 +287,7 @@ void copy(Person** p_arr, Person**& tmp, const size_t size) {
     tmp = new Person * [size];
     if (size > 0) {
         for (size_t i = 0; i < size; i++) {
-            tmp[i] = create(*p_arr[i]);
+            tmp[i] = new Person(*p_arr[i]);
         }
     }
 }

@@ -19,13 +19,12 @@ void gui() {
     bool sortFlag_a1 = false;
     bool sortFlag_p2 = false; //2 sortowanie przez wiek
     bool sortFlag_a2 = false;
-    Family* family = nullptr;
-    Family **fa_arr = nullptr;
+
     Person **p_arr = nullptr;
     Person **tmp_p = nullptr;
     Animal *a_arr = nullptr;
     Animal *tmp_a = nullptr;
-    Family *f_arr = nullptr;
+
     Families* families = nullptr;
     unsigned int choice = 0;
 
@@ -591,6 +590,6 @@ void gui() {
         del(a_arr, a_size);
     }
     if (fa_size > 0){
-        delete family;
+        delete families;
     }
 }
