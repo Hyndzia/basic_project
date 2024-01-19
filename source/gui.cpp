@@ -1,10 +1,13 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
+#include <memory>
 
-#include"Animal.h"
-#include"Person.h"
+#include "Animal.h"
+#include "Person.h"
 #include "Family.h"
 #include "Families.h"
+#include "PassTable.h"
 
 #include"gen.h"
 
@@ -20,12 +23,15 @@ void gui() {
     bool sortFlag_p2 = false; //2 sortowanie przez wiek
     bool sortFlag_a2 = false;
 
-    Person **p_arr = nullptr;
-    Person **tmp_p = nullptr;
-    Animal *a_arr = nullptr;
-    Animal *tmp_a = nullptr;
+    std::vector<std::shared_ptr<Person>> p_arr;
+    std::vector<std::shared_ptr<Person>> tmp_p;
+    //Animal *a_arr = nullptr;
+    std::vector<std::shared_ptr<Animal>> a_arr;
+    //Animal *tmp_a = nullptr;
+    std::vector<std::shared_ptr<Animal>> tmp_a;
+    std::shared_ptr<PassTable> passtab = nullptr;
 
-    Families* families = nullptr;
+    std::shared_ptr<Families> families = nullptr;
     unsigned int choice = 0;
 
     size_t fa_size = 0;
@@ -37,15 +43,18 @@ void gui() {
 
     while (loop) {
         std::cout << "\n###################################################\n";
-        std::cout << "1. Stworz tablice\n";
+        std::cout << "1. Stworz baze\n";
         std::cout << "2. Zainicjalizuj losowymi danymi\n";
         std::cout << "3. pokaz\n";
         std::cout << "4. dodaj\n";
         std::cout << "5. usun\n";
         std::cout << "6. wyszukaj\n";
         std::cout << "7. sortuj\n";
-        std::cout<<"8. edytuj\n";
+        std::cout << "8. edytuj\n";
         std::cout << "9. usun wszystkich\n";
+        std::cout << "10. zapisz\n";
+        std::cout << "11. zaladuj\n";
+        std::cout<<"12. Panel uzytkownika\n";
         std::cout << "0. wyjdz\n";
         std::cout << "###################################################\n\n";
         std::cin >> choice;
@@ -61,8 +70,8 @@ void gui() {
             case 1: {//tworzenie
 
                 unsigned int choice0 = 0;
-                std::cout << "1. Stworz tablice osob\n";
-                std::cout << "2. Stworz tablice zwierzat\n";
+                std::cout << "1. Stworz baze osob\n";
+                std::cout << "2. Stworz baze zwierzat\n";
                 std::cout<<"3. Stworz Rodzine\n";
                 std::cin >> choice0;
                 if (choice0 != 1 && choice0 != 2 && choice0 != 3) {
@@ -83,9 +92,9 @@ void gui() {
                         }*/
                         p_size = size_t_gen(minsize, maxsize);
                         create(p_arr, p_size);
-                        std::cout << "\n\nUtworzono tablice!\n\n";
+                        std::cout << "\n\nUtworzono baze!\n\n";
 
-                    } else std::cout << "Tablica juz utworzona!\n";
+                    } else std::cout << "Baza juz utworzona!\n";
                     break;
                 } else if (choice0 == 2) {
                     if (a_size <= 0) {
@@ -100,25 +109,25 @@ void gui() {
                         size_t maxsize = 25;
                         a_size = size_t_gen(minsize, maxsize);
                         create(a_arr, a_size);
-                        std::cout << "\n\nUtworzono tablice!\n\n";
-                    } else std::cout << "Tablica juz utworzona!\n";
+                        std::cout << "\n\nUtworzono baze!\n\n";
+                    } else std::cout << "Baza juz utworzona!\n";
                     break;
                 } else if(choice0==3){
                     if(fa_size<=0){
                         size_t size = size_t_gen(0, 15);
                         /*family = new Family(size);
                         fa_size = family->get_fSize();*/
-                        families = new Families(size);
+                        families = std::make_unique<Families>(size);
                         fa_size = size;
-                        std::cout<<"\n\nUtworzono tablice rodzin!\n";
-                    } else std::cout << "Tablica juz utworzona!\n";
+                        std::cout<<"\n\nUtworzono baze rodzin!\n";
+                    } else std::cout << "Baza juz utworzona!\n";
                 }
                 break;
             }
             case 2: {//inicjalizacja
                 unsigned int choice0 = 0;
-                std::cout << "\n1. Zainicjalizuj tablice osob\n";
-                std::cout << "\n2. Zainicjalizuj tablice zwierzat\n";
+                std::cout << "\n1. Zainicjalizuj baze osob\n";
+                std::cout << "\n2. Zainicjalizuj baze zwierzat\n";
                 std::cout<<"\n3. Zainicjalizuj rodzine\n";
                 std::cin >> choice0;
                 if (choice0 != 1 && choice0 != 2 && choice0 != 3) {
@@ -128,7 +137,7 @@ void gui() {
                 std::cout << "\n\n";
                 if (choice0 == 1) {
                     if (flag_ini_p) {
-                        std::cout << "\nTablica zostala juz zainicjalizowana!\n";
+                        std::cout << "\nBaza zostala juz zainicjalizowana!\n";
                         break;
                     }
                     if (p_size <= 0) {
@@ -143,7 +152,7 @@ void gui() {
                 }
                 if (choice0 == 2) {
                     if (flag_ini_a) {
-                        std::cout << "\nTablica zostala juz zainicjalizowana!\n";
+                        std::cout << "\nBaza zostala juz zainicjalizowana!\n";
                         break;
                     }
                     if (a_size <= 0) {
@@ -204,7 +213,7 @@ void gui() {
                 unsigned int choice3 = 0;
                 unsigned int choice0 = 0;
 
-                std::cout << "\n\n1. Tablica osob\n2. Tablica zwierzat\n3. Rodzina\n";
+                std::cout << "\n\n1. Baza osob\n2. Baza zwierzat\n3. Rodzina\n";
                 std::cin >> choice0;
                 std::cout << "\n\n";
 
@@ -248,7 +257,8 @@ void gui() {
                         }
                         bool cmp_flag = true; //true=imie, false=wiek
                         tmpsize_p = p_size;
-                        copy(p_arr, tmp_p, tmpsize_p);
+                        //copy(p_arr, tmp_p, tmpsize_p);
+                        tmp_p = p_arr;
                         sort(tmp_p, tmpsize_p, cmp_flag);
                         view(tmp_p, tmpsize_p);
                         std::cout << "\n\n";
@@ -263,7 +273,8 @@ void gui() {
                         }
                         bool cmp_flag = false;
                         tmpsize_p = p_size;
-                        copy(p_arr, tmp_p, tmpsize_p);
+                        //copy(p_arr, tmp_p, tmpsize_p);
+                        tmp_p = p_arr; //wektora nie trzeba kopiowac za pomoca std:copy
                         sort(tmp_p, tmpsize_p, cmp_flag);
                         view(tmp_p, tmpsize_p);
                         std::cout << "\n\n";
@@ -281,7 +292,8 @@ void gui() {
                         }
                         bool cmp_flag = true; //true=imie, false=wiek
                         tmpsize_a = a_size;
-                        copy(a_arr, tmp_a, tmpsize_a);
+                        //copy(a_arr, tmp_a, tmpsize_a);
+                        tmp_a = a_arr;
                         sort(tmp_a, tmpsize_a, cmp_flag);
                         view(tmp_a, tmpsize_a);
                         std::cout << "\n\n";
@@ -296,7 +308,8 @@ void gui() {
                         }
                         bool cmp_flag = false;
                         tmpsize_a = a_size;
-                        copy(a_arr, tmp_a, tmpsize_a);
+                        //copy(a_arr, tmp_a, tmpsize_a);
+                        tmp_a = a_arr;
                         sort(tmp_a, tmpsize_a, cmp_flag);
                         view(tmp_a, tmpsize_a);
                         std::cout << "\n\n";
@@ -321,7 +334,7 @@ void gui() {
                     if (choice2 == 2) break;
                     add(p_arr, p_size);
                     //if (p_arr[0]->age != 0) ini(p_arr[p_size - 1]);
-                    if (flag_ini_p) ini(p_arr[p_size - 1]);
+                    if (flag_ini_p) ini(p_arr.back());
                     if (sortFlag_p1) sortFlag_p1 = false;
                     if (sortFlag_p2) sortFlag_p2 = false;
                     std::cout << "Dodano nowa osobe!\n\n";
@@ -397,7 +410,7 @@ void gui() {
                             std::cout << "\n\nBrak osoby o takim imieniu!\n\n";
                             break;
                         }
-                        search(p_arr, p_size, imie);
+                        search(p_arr, imie);
                         std::cout << "\n\nZnaleziono " << count << " osob!\n\n";
                     } else {
                         unsigned int wiek = 0;
@@ -548,7 +561,7 @@ void gui() {
             }
             case 9: { //clear
                 unsigned int choice0 = 0;
-                std::cout << "\n1. Usun wszystkie osoby\n2. Usun wszystkie zwierzeta\n";
+                std::cout << "\n1. Usun wszystkie osoby\n2. Usun wszystkie zwierzeta\n3. Usuń baze rodzin\n";
                 std::cin >> choice0;
                 std::cout << "\n\n";
                 if (choice0 == 1) {
@@ -576,6 +589,56 @@ void gui() {
                     std::cout << "Usunieto!\n";
                     break;
                 }
+                else if (choice0 == 3) {
+                    if (fa_size <= 0) {
+                        std::cout << "Brak rodzin!\n";
+                        break;
+                    }
+                    families->clear();
+                    flag_ini_f = false;
+                    fa_size = 0;
+                    std::cout << "Usunieto!\n";
+                    break;
+                }
+            }
+            case 10: {
+                unsigned int choice0 = 0;
+                std::cout << "\n1. zaladuj tablice rodzin\n";
+                std::cin>>choice0;
+                if (choice0 == 1) {
+                    if (families != nullptr) {
+                        *families<<"file.dat";
+                    } else std::cout << "\nTablica juz istnieje!\n";
+                }
+                std::cout<<"zapisano\n";
+                break;
+            }
+            case 11: {
+                unsigned int choice0 = 0;
+                std::cout << "\n1. zaladuj tablice rodzin\n";
+                std::cin>>choice0;
+                if(choice0 == 1) {
+                    if (families == nullptr) {
+                        families = std::make_unique<Families>();
+                        *families>>"file.dat";
+                        fa_size = families->getFamCount();
+                    } else if (!flag_ini_f) std::cout << "\nTablica juz istnieje!\n";
+                }
+                break;
+            }
+            case 12: {
+                unsigned int choice0 = 0;
+                bool passFlag = false;
+                std::cout<<"\n1. Zaloguj sie\n";
+                std::cin>>choice0;
+                if(choice0==1){
+                    if(passtab == nullptr){
+                        if(flag_ini_p) {
+                            passtab = std::make_shared<PassTable>(p_arr);
+                        }
+                    }
+                        login(p_arr, passtab, passFlag);
+                }
             }
             default:
                 break;
@@ -583,13 +646,10 @@ void gui() {
         system("pause");
         system("cls");
     }
-    if (p_size > 0) {
+  /*  if (p_size > 0) {
         del(p_arr, p_size);
     }
     if (a_size > 0) {
         del(a_arr, a_size);
-    }
-    if (fa_size > 0){
-        delete families;
-    }
+    }*/
 }

@@ -52,3 +52,11 @@ std::string surname_gen(){
     static std::string tab[] = {"Bialik", "Wegner", "Banasik", "Zaczek", "Majcher", "Antosz", "Pazio", "Kalina", "Cieszynski", "Polec", "Rosiek", "Pastusiak", "Martyniak", "Wnek", "Herman", "Zylka", "Syrek", "Rodziewicz", "Latusek", "Migas"};
     return tab[size_t_gen(0, 19)];
 }
+std::string string_gen(const unsigned int length)
+{
+    std::string str;
+    char tab[26] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g','h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u','v', 'w', 'x', 'y', 'z' };
+    for (int i = 0; i < length; i++)
+        str = str + tab[size_t_gen(0, 25)];
+    return str;
+}

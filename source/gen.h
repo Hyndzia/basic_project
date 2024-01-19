@@ -10,3 +10,4 @@ unsigned int age_gen();
 unsigned int a_age_gen();
 std::string gender_gen(std::string name);
 std::string surname_gen();
+std::string string_gen(const unsigned int length);

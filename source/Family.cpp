@@ -1,19 +1,20 @@
 #include <string>
 #include<iostream>
-#include "Family.h"
+#include <fstream>
 #include "Families.h"
+#include <memory>
 
-void Families::Family::view(Person*& p) {
+void Families::Family::view(std::shared_ptr<Person>& p) {
     std::cout << "\n===================================================\n";
     std::cout << "\n   imie:  " << p->getName() << "\n   nazwisko:  " << p->getSurname() << "\n   wiek: " << p->getAge() << "\n   plec: " << p->getGender();
     std::cout << "\n\n";
 }
 void Families::Family::create_p(const size_t size) {
-    osoby = new Person * [size];
-    for (size_t i = 0; i < size; i++) {
-        osoby[i] = new Person();
-    }
+    osoby.reserve(size);
     f_size = size;
+    for (size_t i = 0; i < size; i++) {
+        osoby.push_back(std::make_shared<Person>(Person()));
+    }
 }
 void Families::Family::view() {
     std::cout << "Rodzina: " << familyName << ".\n";
@@ -36,18 +37,18 @@ void Families::Family::ini() {
             ini(osoby[i]);
     }
 }
-void Families::Family::ini(Person* person) { gen_data(person); }
+void Families::Family::ini(std::shared_ptr<Person> person) { gen_data(person); }
 
-Person **Families::Family::getOsoby() {
+std::vector<std::shared_ptr<Person>> Families::Family::getOsoby() {
     return osoby;
 }
- Person* Families::Family::getOsoba(size_t ind){
+std::shared_ptr<Person> Families::Family::getOsoba(size_t ind){
     return osoby[ind];
 }
-void Families::Family::setOsoby(Person **osoby) {
+void Families::Family::setOsoby(std::vector<std::shared_ptr<Person>> osoby) {
     Families::Family::osoby = osoby;
 }
-void Families::Family::setOsoba(size_t ind, Person *osoba) {
+void Families::Family::setOsoba(size_t ind, std::shared_ptr<Person> osoba) {
     Families::Family::osoby[ind] = osoba;
 }
 
@@ -62,3 +63,10 @@ void Families::Family::setFamilyName(const std::string &familyName) {
 void Families::Family::setFSize(size_t fSize) {
     f_size = fSize;
 }
+std::shared_ptr<Person>& Families::Family::operator[](size_t index) {
+    if (index >= f_size) {
+        throw std::out_of_range("Invalid index");
+    }
+    return osoby[index];
+}
+
